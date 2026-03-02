@@ -1,0 +1,13 @@
+{
+  "name": "sports-oracle",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": { "start": "node index.js" },
+  "dependencies": {
+    "express": "^5.0.0",
+    "@anthropic-ai/sdk": "^0.20.0",
+    "openai": "^4.28.0",
+    "@google/generative-ai": "^0.2.1",
+    "node-fetch": "^2.7.0"
+  }
+}
