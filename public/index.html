@@ -175,4 +175,400 @@
           <div style="margin-top:12px">
             <label>Players / Picks</label>
             <div class="player-tags" id="tags-A" onclick="focusTagInput('tagInput-A')">
-              <input class="tag-input" id="tagInput-A" placeholder="Type name, press Enter..." onkeydown="handleTa
+              <input class="tag-input" id="tagInput-A" placeholder="Type name, press Enter..." onkeydown="handleTagInput(event,'A')"/>
+            </div>
+            <div class="tag-hint">Press Enter after each player or pick</div>
+          </div>
+        </div>
+        <div class="trade-arrow">⇄</div>
+        <div>
+          <div class="trade-side-label b">Team B Gives Up</div>
+          <label>Team Name (optional)</label>
+          <input type="text" id="trade-teamB" placeholder="e.g. San Francisco 49ers"/>
+          <div style="margin-top:12px">
+            <label>Players / Picks</label>
+            <div class="player-tags" id="tags-B" onclick="focusTagInput('tagInput-B')">
+              <input class="tag-input" id="tagInput-B" placeholder="Type name, press Enter..." onkeydown="handleTagInput(event,'B')"/>
+            </div>
+            <div class="tag-hint">Press Enter after each player or pick</div>
+          </div>
+        </div>
+      </div>
+      <button class="submit-btn" onclick="runTrade()">⚡ ANALYZE TRADE</button>
+    </div>
+  </div>
+
+  <!-- DRAFT PANEL -->
+  <div class="panel" id="panel-draft">
+    <div class="form-card">
+      <div class="section-label">Sport & Mode</div>
+      <div class="sport-selector">
+        <button class="sport-btn active" onclick="setSport('draft','NFL',this)">🏈 NFL</button>
+        <button class="sport-btn" onclick="setSport('draft','NHL',this)">🏒 NHL</button>
+        <button class="sport-btn" onclick="setSport('draft','NBA',this)">🏀 NBA</button>
+        <button class="sport-btn" onclick="setSport('draft','MLB',this)">⚾ MLB</button>
+      </div>
+      <div class="mode-toggle">
+        <button class="toggle-btn active" onclick="setMode('draft','real',this)">🏟 Real Life Draft</button>
+        <button class="toggle-btn" onclick="setMode('draft','fantasy',this)">🎮 Fantasy Draft</button>
+      </div>
+      <div class="section-label">Draft Situation</div>
+      <div class="form-row">
+        <div>
+          <label>Your Team / Manager Name</label>
+          <input type="text" id="draft-team" placeholder="e.g. Chicago Bears"/>
+        </div>
+        <div>
+          <label>Draft Position / Pick Number</label>
+          <input type="text" id="draft-pick" placeholder="e.g. #5 overall, Round 3 Pick 2"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Team Needs / Roster Holes</label>
+        <input type="text" id="draft-needs" placeholder="e.g. Need WR and OL depth, strong QB already"/>
+      </div>
+      <div class="form-group">
+        <label>Players You're Considering (optional)</label>
+        <textarea id="draft-available" placeholder="e.g. Drake Maye, Caleb Williams — or leave blank for open recommendation"></textarea>
+      </div>
+      <button class="submit-btn" onclick="runDraft()">🎯 GET DRAFT ADVICE</button>
+    </div>
+  </div>
+
+  <!-- START/SIT PANEL -->
+  <div class="panel" id="panel-startsit">
+    <div class="form-card">
+      <div class="section-label">Sport</div>
+      <div class="sport-selector">
+        <button class="sport-btn active" onclick="setSport('startsit','NFL',this)">🏈 NFL</button>
+        <button class="sport-btn" onclick="setSport('startsit','NHL',this)">🏒 NHL</button>
+        <button class="sport-btn" onclick="setSport('startsit','NBA',this)">🏀 NBA</button>
+        <button class="sport-btn" onclick="setSport('startsit','MLB',this)">⚾ MLB</button>
+      </div>
+      <div class="section-label">Head to Head</div>
+      <div class="form-row">
+        <div>
+          <label>Player 1</label>
+          <input type="text" id="ss-playerA" placeholder="e.g. Justin Jefferson"/>
+        </div>
+        <div>
+          <label>Player 2</label>
+          <input type="text" id="ss-playerB" placeholder="e.g. Davante Adams"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Additional Context (optional)</label>
+        <input type="text" id="ss-context" placeholder="e.g. PPR league, Week 14, tough matchup vs Bills D"/>
+      </div>
+      <button class="submit-btn" onclick="runStartSit()">⚡ GET START/SIT ADVICE</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results-section">
+    <div id="consensusBanner" style="display:none"></div>
+    <div class="results-header">BREAKDOWN BY AI</div>
+    <div class="results-grid" id="resultsGrid"></div>
+  </div>
+
+  <footer>
+    Sports Oracle — Powered by Claude, ChatGPT & Gemini<br>
+    <span style="opacity:0.5">For entertainment. Always do your own research.</span>
+  </footer>
+</div>
+
+<script>
+  const state = {
+    trade: { sport:'NFL', mode:'real' },
+    draft: { sport:'NFL', mode:'real' },
+    startsit: { sport:'NFL' },
+    playersA: [], playersB: [],
+    currentMode: 'trade',
+  };
+  let enabledModels = [];
+  let allResults = {};
+  const MODEL_COLORS = { claude:'#ff6b35', gpt4:'#19c37d', gemini:'#4285f4' };
+  const MODEL_LABELS = { claude:'CLAUDE', gpt4:'CHATGPT', gemini:'GEMINI' };
+
+  async function init() {
+    try {
+      const res = await fetch('/api/config');
+      const data = await res.json();
+      enabledModels = data.models;
+      const pills = document.getElementById('modelPills');
+      pills.innerHTML = '';
+      enabledModels.forEach(m => {
+        const p = document.createElement('div');
+        p.className = 'model-pill active';
+        p.dataset.model = m.id;
+        p.innerHTML = `<span class="dot"></span>${m.label}`;
+        pills.appendChild(p);
+      });
+      if (!enabledModels.length) showError('No API keys configured.');
+    } catch(e) { showError('Cannot connect to server.'); }
+  }
+
+  function switchMode(mode) {
+    state.currentMode = mode;
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`panel-${mode}`).classList.add('active');
+    document.getElementById('results-section').style.display = 'none';
+    document.getElementById('consensusBanner').style.display = 'none';
+  }
+
+  function setSport(panel, sport, btn) {
+    state[panel].sport = sport;
+    btn.closest('.sport-selector').querySelectorAll('.sport-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function setMode(panel, mode, btn) {
+    state[panel].mode = mode;
+    btn.closest('.mode-toggle').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function handleTagInput(e, side) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const input = document.getElementById(`tagInput-${side}`);
+      const val = input.value.trim().replace(/,$/, '');
+      if (!val) return;
+      (side === 'A' ? state.playersA : state.playersB).push(val);
+      renderTags(side);
+      input.value = '';
+    }
+    if (e.key === 'Backspace' && document.getElementById(`tagInput-${side}`).value === '') {
+      const arr = side === 'A' ? state.playersA : state.playersB;
+      if (arr.length) { arr.pop(); renderTags(side); }
+    }
+  }
+
+  function removeTag(side, idx) {
+    (side === 'A' ? state.playersA : state.playersB).splice(idx, 1);
+    renderTags(side);
+  }
+
+  function renderTags(side) {
+    const arr = side === 'A' ? state.playersA : state.playersB;
+    const container = document.getElementById(`tags-${side}`);
+    const input = document.getElementById(`tagInput-${side}`);
+    container.innerHTML = '';
+    arr.forEach((p, i) => {
+      const tag = document.createElement('div');
+      tag.className = 'player-tag';
+      tag.innerHTML = `${p}<button onclick="removeTag('${side}',${i})">×</button>`;
+      container.appendChild(tag);
+    });
+    container.appendChild(input);
+  }
+
+  function focusTagInput(id) { document.getElementById(id).focus(); }
+  function showError(msg) { const el = document.getElementById('errorBanner'); el.textContent = msg; el.classList.add('active'); }
+  function hideError() { document.getElementById('errorBanner').classList.remove('active'); }
+  function showProgress(label) { document.getElementById('progressLabel').textContent = label; document.getElementById('progressBar').classList.add('active'); document.getElementById('progressFill').style.width = '60%'; }
+  function hideProgress() { document.getElementById('progressBar').classList.remove('active'); document.getElementById('progressFill').style.width = '0%'; }
+
+  function parseResponse(text) {
+    const lines = text.split('\n').filter(l => l.trim());
+    const result = {};
+    let currentKey = null;
+    let currentVal = [];
+    for (const line of lines) {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx > 0) {
+        const key = line.slice(0, colonIdx).trim().toUpperCase().replace(/\s+/g, '_');
+        const val = line.slice(colonIdx + 1).trim();
+        if (['WINNER','START','PICK','CONFIDENCE','VERDICT','ANALYSIS','REASONING','KEY_FACTOR','RISK','UPSIDE','FLOOR','ALTERNATIVE','CEILING','WATCH_OUT'].includes(key)) {
+          if (currentKey) result[currentKey] = currentVal.join(' ').trim();
+          currentKey = key;
+          currentVal = [val];
+          continue;
+        }
+      }
+      if (currentKey) currentVal.push(line.trim());
+    }
+    if (currentKey) result[currentKey] = currentVal.join(' ').trim();
+    return result;
+  }
+
+  function getConfidenceClass(val) {
+    const n = parseInt(val);
+    if (n >= 70) return 'high';
+    if (n >= 45) return 'medium';
+    return 'low';
+  }
+
+  function initResults() {
+    allResults = {};
+    const grid = document.getElementById('resultsGrid');
+    grid.innerHTML = '';
+    document.getElementById('consensusBanner').style.display = 'none';
+    document.getElementById('results-section').style.display = 'block';
+    enabledModels.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.dataset.model = m.id;
+      card.innerHTML = `
+        <div class="result-card-header">
+          <div class="result-model-info">
+            <div class="result-model-dot" style="background:${MODEL_COLORS[m.id]}"></div>
+            <div class="result-model-name">${MODEL_LABELS[m.id]}</div>
+          </div>
+          <div class="mini-verdict loading-v" id="mini-${m.id}">···</div>
+        </div>
+        <div class="confidence-section" id="conf-section-${m.id}" style="display:none">
+          <div class="confidence-label"><span>CONFIDENCE</span><span class="confidence-value" id="conf-val-${m.id}">—</span></div>
+          <div class="conf-track"><div class="conf-fill" id="conf-fill-${m.id}"></div></div>
+        </div>
+        <div class="result-body" id="result-${m.id}"><span class="loading">···</span></div>`;
+      grid.appendChild(card);
+    });
+    setTimeout(() => document.getElementById('results-section').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+  }
+
+  function fillResult(modelId, answer, isError) {
+    allResults[modelId] = { answer, isError };
+    if (isError) {
+      document.getElementById(`result-${modelId}`).classList.add('error');
+      document.getElementById(`result-${modelId}`).textContent = answer;
+      document.getElementById(`mini-${modelId}`).textContent = 'ERROR';
+      return;
+    }
+    const parsed = parseResponse(answer);
+    const winner = parsed.WINNER || parsed.START || parsed.PICK || '';
+    const confidence = parseInt(parsed.CONFIDENCE) || 0;
+    const mode = state.currentMode;
+
+    const miniEl = document.getElementById(`mini-${modelId}`);
+    miniEl.textContent = winner ? winner.toUpperCase() : '—';
+    miniEl.className = 'mini-verdict winner-a';
+
+    if (confidence > 0) {
+      document.getElementById(`conf-section-${modelId}`).style.display = 'block';
+      document.getElementById(`conf-val-${modelId}`).textContent = `${confidence}%`;
+      const fill = document.getElementById(`conf-fill-${modelId}`);
+      fill.className = `conf-fill ${getConfidenceClass(confidence)}`;
+      setTimeout(() => { fill.style.width = `${confidence}%`; }, 100);
+    }
+
+    const body = document.getElementById(`result-${modelId}`);
+    body.innerHTML = '';
+    const fields = mode === 'trade'
+      ? [['ANALYSIS','analysis'],['KEY_FACTOR','key'],['RISK','risk']]
+      : mode === 'draft'
+      ? [['REASONING','analysis'],['UPSIDE','up'],['FLOOR','risk'],['ALTERNATIVE','key']]
+      : [['REASONING','analysis'],['CEILING','up'],['WATCH_OUT','risk']];
+
+    fields.forEach(([key, cls]) => {
+      if (parsed[key]) {
+        const row = document.createElement('div');
+        row.className = 'detail-row';
+        row.innerHTML = `<div class="detail-label">${key.replace(/_/g,' ')}</div><div class="detail-text ${cls}">${parsed[key]}</div>`;
+        body.appendChild(row);
+      }
+    });
+    if (!body.children.length) body.textContent = answer;
+    updateConsensusBanner();
+  }
+
+  function updateConsensusBanner() {
+    const completed = Object.keys(allResults).filter(k => !allResults[k].isError);
+    if (!completed.length) return;
+    const winners = completed.map(k => {
+      const p = parseResponse(allResults[k].answer);
+      return (p.WINNER || p.START || p.PICK || '').trim();
+    }).filter(Boolean);
+    if (!winners.length) return;
+    const counts = {};
+    winners.forEach(w => { counts[w] = (counts[w] || 0) + 1; });
+    const topWinner = Object.entries(counts).sort((a,b) => b[1]-a[1])[0];
+    const avgConf = completed.reduce((sum, k) => {
+      const p = parseResponse(allResults[k].answer);
+      return sum + (parseInt(p.CONFIDENCE) || 50);
+    }, 0) / completed.length;
+    const firstParsed = parseResponse(allResults[completed[0]].answer);
+    const verdictText = firstParsed.VERDICT || '';
+    const mode = state.currentMode;
+    const eyebrow = mode === 'trade' ? '🏆 TRADE WINNER' : mode === 'draft' ? '🎯 THE PICK' : '✅ START THIS PLAYER';
+    const banner = document.getElementById('consensusBanner');
+    banner.style.display = 'block';
+    banner.innerHTML = `
+      <div class="consensus-banner">
+        <div class="consensus-eyebrow">${eyebrow} — AI CONSENSUS</div>
+        <div class="consensus-winner">${topWinner[0].toUpperCase()}</div>
+        ${verdictText ? `<div class="consensus-verdict">${verdictText}</div>` : ''}
+        <div class="consensus-votes">
+          ${completed.map(k => {
+            const p = parseResponse(allResults[k].answer);
+            const w = (p.WINNER || p.START || p.PICK || '').trim();
+            const agrees = w.toUpperCase() === topWinner[0].toUpperCase();
+            return `<div class="vote-chip ${agrees ? 'agree' : 'disagree'}">
+              <span style="width:6px;height:6px;border-radius:50%;background:${MODEL_COLORS[k]};display:inline-block"></span>
+              ${MODEL_LABELS[k]}: ${w || '?'}
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:16px;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:1px">AVG CONFIDENCE ${Math.round(avgConf)}%</div>
+      </div>`;
+  }
+
+  async function streamResults(endpoint, body) {
+    hideError();
+    if (!enabledModels.length) { showError('No API keys configured.'); return; }
+    showProgress('Consulting AI analysts...');
+    initResults();
+    document.querySelectorAll('.submit-btn').forEach(b => b.disabled = true);
+    try {
+      const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Server error'); }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream:true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === 'result') fillResult(event.modelId, event.answer, event.isError);
+            if (event.type === 'done') hideProgress();
+          } catch(e) {}
+        }
+      }
+    } catch(err) {
+      showError('Error: ' + err.message);
+      hideProgress();
+    } finally {
+      document.querySelectorAll('.submit-btn').forEach(b => b.disabled = false);
+    }
+  }
+
+  function runTrade() {
+    if (!state.playersA.length || !state.playersB.length) { showError('Add at least one player to each side of the trade.'); return; }
+    streamResults('/api/trade', { sport:state.trade.sport, mode:state.trade.mode, teamA:document.getElementById('trade-teamA').value, playersA:state.playersA, teamB:document.getElementById('trade-teamB').value, playersB:state.playersB });
+  }
+
+  function runDraft() {
+    const pick = document.getElementById('draft-pick').value.trim();
+    if (!pick) { showError('Please enter a draft position or pick number.'); return; }
+    streamResults('/api/draft', { sport:state.draft.sport, mode:state.draft.mode, team:document.getElementById('draft-team').value, pick, needs:document.getElementById('draft-needs').value, available:document.getElementById('draft-available').value });
+  }
+
+  function runStartSit() {
+    const pA = document.getElementById('ss-playerA').value.trim();
+    const pB = document.getElementById('ss-playerB').value.trim();
+    if (!pA || !pB) { showError('Please enter both players.'); return; }
+    streamResults('/api/startsit', { sport:state.startsit.sport, playerA:pA, playerB:pB, context:document.getElementById('ss-context').value });
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
