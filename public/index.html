@@ -14,7 +14,6 @@
       --claude: #ff6b35; --chatgpt: #19c37d; --gemini: #4285f4;
     }
     body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; overflow-x:hidden; }
-    body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); opacity:0.4; }
     .field-bg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
     .field-bg::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg,transparent 0%,rgba(255,107,53,0.03) 50%,transparent 100%),repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(255,255,255,0.015) 80px,rgba(255,255,255,0.015) 81px); }
     .wrap { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 24px 100px; }
@@ -22,7 +21,7 @@
     .logo { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,6vw,56px); letter-spacing:2px; line-height:1; background:linear-gradient(135deg,#ff6b35,#ffd700); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
     .logo-sub { font-size:11px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-top:4px; }
     .model-pills { display:flex; gap:8px; flex-wrap:wrap; }
-    .model-pill { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600; letter-spacing:0.5px; border:1px solid; opacity:0.5; transition:opacity 0.3s; }
+    .model-pill { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600; border:1px solid; opacity:0.5; transition:opacity 0.3s; }
     .model-pill.active { opacity:1; }
     .model-pill .dot { width:6px; height:6px; border-radius:50%; }
     .model-pill[data-model="claude"] { border-color:var(--claude); color:var(--claude); }
@@ -31,8 +30,8 @@
     .model-pill[data-model="gpt4"] .dot { background:var(--chatgpt); }
     .model-pill[data-model="gemini"] { border-color:var(--gemini); color:var(--gemini); }
     .model-pill[data-model="gemini"] .dot { background:var(--gemini); }
-    .mode-tabs { display:flex; gap:0; margin-bottom:32px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
-    .mode-tab { flex:1; padding:16px 8px; text-align:center; cursor:pointer; border:none; background:none; color:var(--muted); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; transition:all 0.2s; border-right:1px solid var(--border); position:relative; }
+    .mode-tabs { display:flex; margin-bottom:32px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+    .mode-tab { flex:1; padding:16px 8px; text-align:center; cursor:pointer; border:none; background:none; color:var(--muted); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; text-transform:uppercase; transition:all 0.2s; border-right:1px solid var(--border); position:relative; }
     .mode-tab:last-child { border-right:none; }
     .mode-tab.active { color:var(--text); background:rgba(255,107,53,0.1); }
     .mode-tab.active::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--orange); }
@@ -52,11 +51,11 @@
     select option { background:#1a1a2e; }
     textarea { resize:vertical; min-height:80px; }
     .sport-selector { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-    .sport-btn { padding:8px 16px; border-radius:6px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+    .sport-btn { padding:8px 16px; border-radius:6px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; }
     .sport-btn.active { border-color:var(--orange); color:var(--orange); background:rgba(255,107,53,0.1); }
     .sport-btn:hover:not(.active) { border-color:rgba(255,255,255,0.2); color:var(--text); }
     .mode-toggle { display:flex; gap:8px; margin-bottom:20px; }
-    .toggle-btn { padding:7px 18px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'Inter',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; letter-spacing:0.5px; }
+    .toggle-btn { padding:7px 18px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'Inter',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; }
     .toggle-btn.active { border-color:var(--orange); color:var(--orange); background:rgba(255,107,53,0.1); }
     .player-tags { display:flex; flex-wrap:wrap; gap:6px; min-height:44px; padding:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:6px; cursor:text; transition:border-color 0.2s; }
     .player-tags:focus-within { border-color:rgba(255,107,53,0.5); }
@@ -67,35 +66,13 @@
     .trade-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:start; margin-bottom:20px; }
     @media(max-width:640px) { .trade-grid { grid-template-columns:1fr; } }
     .trade-arrow { display:flex; align-items:center; justify-content:center; padding-top:28px; font-size:24px; color:var(--muted); }
-    .trade-side-label { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:1px; margin-bottom:8px; color:var(--muted); }
+    .trade-side-label { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:1px; margin-bottom:8px; }
     .trade-side-label.a { color:var(--orange); }
     .trade-side-label.b { color:var(--blue); }
     .submit-btn { background:linear-gradient(135deg,#ff6b35,#ff4500); color:#fff; border:none; padding:14px 32px; font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px; cursor:pointer; border-radius:6px; transition:all 0.2s; width:100%; box-shadow:0 4px 20px rgba(255,107,53,0.3); }
     .submit-btn:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 28px rgba(255,107,53,0.45); }
     .submit-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
-    #results-section { display:none; margin-top:32px; }
-    #results-section.active { display:block; animation:fadeUp 0.4s ease; }
-    .results-header { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:2px; margin-bottom:20px; color:var(--orange); display:flex; align-items:center; gap:12px; }
-    .results-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
-    .result-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; animation:fadeUp 0.4s ease; position:relative; }
-    .result-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-    .result-card[data-model="claude"]::before { background:var(--claude); }
-    .result-card[data-model="gpt4"]::before { background:var(--chatgpt); }
-    .result-card[data-model="gemini"]::before { background:var(--gemini); }
-    .result-card-header { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
-    .result-model-dot { width:8px; height:8px; border-radius:50%; }
-    .result-model-name { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; }
-    .result-card[data-model="claude"] .result-model-name { color:var(--claude); }
-    .result-card[data-model="gpt4"] .result-model-name { color:var(--chatgpt); }
-    .result-card[data-model="gemini"] .result-model-name { color:var(--gemini); }
-    .result-body { padding:18px; font-size:13px; line-height:1.8; color:rgba(255,255,255,0.75); white-space:pre-wrap; }
-    .result-body.error { color:#ff6b6b; }
-    .result-body .loading { color:var(--muted); animation:pulse 1.2s infinite; letter-spacing:3px; }
-    @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-    .result-body .line-winner { color:#ffd700; font-weight:700; font-size:14px; }
-    .result-body .line-key { color:var(--orange); }
-    .result-body .line-risk { color:#ff6b6b; }
-    .result-body .line-up { color:var(--green); }
+    .section-label { font-size:10px; font-weight:700; letter-spacing:2.5px; color:var(--muted); text-transform:uppercase; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
     .error-banner { display:none; background:rgba(255,107,107,0.08); border:1px solid rgba(255,107,107,0.25); border-radius:6px; padding:12px 16px; color:#ff6b6b; font-size:13px; margin-bottom:16px; }
     .error-banner.active { display:block; }
     .progress-bar { display:none; margin-bottom:16px; }
@@ -103,7 +80,52 @@
     .progress-track { height:3px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
     .progress-fill { height:100%; background:linear-gradient(90deg,#ff6b35,#ffd700); width:0%; transition:width 0.5s ease; border-radius:2px; }
     .progress-label { font-size:11px; color:var(--muted); letter-spacing:1px; margin-bottom:6px; text-transform:uppercase; }
-    .section-label { font-size:10px; font-weight:700; letter-spacing:2.5px; color:var(--muted); text-transform:uppercase; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+    #results-section { display:none; margin-top:32px; }
+    #results-section.active { display:block; animation:fadeUp 0.4s ease; }
+    .consensus-banner { background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,215,0,0.08)); border:1px solid rgba(255,107,53,0.3); border-radius:12px; padding:32px; margin-bottom:24px; text-align:center; position:relative; overflow:hidden; animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes popIn { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
+    .consensus-banner::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(255,107,53,0.1) 0%,transparent 70%); pointer-events:none; }
+    .consensus-eyebrow { font-size:10px; font-weight:700; letter-spacing:3px; color:rgba(255,107,53,0.7); text-transform:uppercase; margin-bottom:12px; }
+    .consensus-winner { font-family:'Bebas Neue',sans-serif; font-size:clamp(48px,8vw,80px); letter-spacing:3px; line-height:1; background:linear-gradient(135deg,#ff6b35,#ffd700); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:12px; }
+    .consensus-verdict { font-size:16px; font-weight:600; color:rgba(255,255,255,0.85); max-width:600px; margin:0 auto 20px; line-height:1.5; }
+    .consensus-votes { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .vote-chip { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; border:1px solid; }
+    .vote-chip.agree { background:rgba(25,195,125,0.1); border-color:rgba(25,195,125,0.3); color:#19c37d; }
+    .vote-chip.disagree { background:rgba(255,107,107,0.1); border-color:rgba(255,107,107,0.3); color:#ff6b6b; }
+    .results-header { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; margin-bottom:16px; color:var(--muted); }
+    .results-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
+    .result-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; animation:fadeUp 0.4s ease; position:relative; }
+    .result-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .result-card[data-model="claude"]::before { background:var(--claude); }
+    .result-card[data-model="gpt4"]::before { background:var(--chatgpt); }
+    .result-card[data-model="gemini"]::before { background:var(--gemini); }
+    .result-card-header { padding:14px 18px 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .result-model-info { display:flex; align-items:center; gap:8px; }
+    .result-model-dot { width:8px; height:8px; border-radius:50%; }
+    .result-model-name { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; }
+    .result-card[data-model="claude"] .result-model-name { color:var(--claude); }
+    .result-card[data-model="gpt4"] .result-model-name { color:var(--chatgpt); }
+    .result-card[data-model="gemini"] .result-model-name { color:var(--gemini); }
+    .mini-verdict { font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:1px; }
+    .mini-verdict.winner-a { color:var(--orange); }
+    .mini-verdict.loading-v { color:var(--muted); animation:pulse 1.2s infinite; }
+    .confidence-section { padding:10px 18px; border-bottom:1px solid var(--border); }
+    .confidence-label { display:flex; justify-content:space-between; font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; margin-bottom:6px; }
+    .conf-track { height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+    .conf-fill { height:100%; border-radius:3px; transition:width 1s cubic-bezier(0.34,1.56,0.64,1); width:0%; }
+    .conf-fill.high { background:linear-gradient(90deg,#19c37d,#00ff9d); }
+    .conf-fill.medium { background:linear-gradient(90deg,#ffd700,#ffaa00); }
+    .conf-fill.low { background:linear-gradient(90deg,#ff6b6b,#ff4500); }
+    .result-body { padding:16px 18px; font-size:13px; line-height:1.8; color:rgba(255,255,255,0.7); }
+    .result-body.error { color:#ff6b6b; }
+    .result-body .loading { color:var(--muted); animation:pulse 1.2s infinite; letter-spacing:3px; font-size:18px; }
+    @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+    .detail-row { margin-bottom:10px; }
+    .detail-label { font-size:9px; font-weight:700; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:3px; }
+    .detail-text { font-size:13px; color:rgba(255,255,255,0.75); line-height:1.6; }
+    .detail-text.key { color:var(--orange); font-weight:600; }
+    .detail-text.risk { color:#ff6b6b; }
+    .detail-text.up { color:var(--green); }
     footer { margin-top:80px; padding-top:24px; border-top:1px solid var(--border); text-align:center; color:var(--muted); font-size:12px; }
   </style>
 </head>
@@ -113,21 +135,15 @@
   <header>
     <div>
       <div class="logo">Sports Oracle</div>
-      <div class="logo-sub">Multi-AI Sports Analysis Engine</div>
+      <div class="logo-sub">Multi-AI Sports Analysis Engine • March 2026</div>
     </div>
     <div class="model-pills" id="modelPills"></div>
   </header>
 
   <div class="mode-tabs">
-    <button class="mode-tab active" data-mode="trade" onclick="switchMode('trade')">
-      <span class="mode-icon">🔄</span>Trade Analyzer
-    </button>
-    <button class="mode-tab" data-mode="draft" onclick="switchMode('draft')">
-      <span class="mode-icon">🎯</span>Draft Advisor
-    </button>
-    <button class="mode-tab" data-mode="startsit" onclick="switchMode('startsit')">
-      <span class="mode-icon">⚡</span>Start / Sit
-    </button>
+    <button class="mode-tab active" data-mode="trade" onclick="switchMode('trade')"><span class="mode-icon">🔄</span>Trade Analyzer</button>
+    <button class="mode-tab" data-mode="draft" onclick="switchMode('draft')"><span class="mode-icon">🎯</span>Draft Advisor</button>
+    <button class="mode-tab" data-mode="startsit" onclick="switchMode('startsit')"><span class="mode-icon">⚡</span>Start / Sit</button>
   </div>
 
   <div class="error-banner" id="errorBanner"></div>
@@ -159,284 +175,4 @@
           <div style="margin-top:12px">
             <label>Players / Picks</label>
             <div class="player-tags" id="tags-A" onclick="focusTagInput('tagInput-A')">
-              <input class="tag-input" id="tagInput-A" placeholder="Type name, press Enter..." onkeydown="handleTagInput(event,'A')"/>
-            </div>
-            <div class="tag-hint">Press Enter after each player or pick</div>
-          </div>
-        </div>
-        <div class="trade-arrow">⇄</div>
-        <div>
-          <div class="trade-side-label b">Team B Gives Up</div>
-          <label>Team Name (optional)</label>
-          <input type="text" id="trade-teamB" placeholder="e.g. San Francisco 49ers"/>
-          <div style="margin-top:12px">
-            <label>Players / Picks</label>
-            <div class="player-tags" id="tags-B" onclick="focusTagInput('tagInput-B')">
-              <input class="tag-input" id="tagInput-B" placeholder="Type name, press Enter..." onkeydown="handleTagInput(event,'B')"/>
-            </div>
-            <div class="tag-hint">Press Enter after each player or pick</div>
-          </div>
-        </div>
-      </div>
-      <button class="submit-btn" onclick="runTrade()">⚡ ANALYZE TRADE</button>
-    </div>
-  </div>
-
-  <!-- DRAFT PANEL -->
-  <div class="panel" id="panel-draft">
-    <div class="form-card">
-      <div class="section-label">Sport & Mode</div>
-      <div class="sport-selector">
-        <button class="sport-btn active" onclick="setSport('draft','NFL',this)">🏈 NFL</button>
-        <button class="sport-btn" onclick="setSport('draft','NHL',this)">🏒 NHL</button>
-        <button class="sport-btn" onclick="setSport('draft','NBA',this)">🏀 NBA</button>
-        <button class="sport-btn" onclick="setSport('draft','MLB',this)">⚾ MLB</button>
-      </div>
-      <div class="mode-toggle">
-        <button class="toggle-btn active" onclick="setMode('draft','real',this)">🏟 Real Life Draft</button>
-        <button class="toggle-btn" onclick="setMode('draft','fantasy',this)">🎮 Fantasy Draft</button>
-      </div>
-      <div class="section-label">Draft Situation</div>
-      <div class="form-row">
-        <div>
-          <label>Your Team / Manager Name</label>
-          <input type="text" id="draft-team" placeholder="e.g. Chicago Bears"/>
-        </div>
-        <div>
-          <label>Draft Position / Pick Number</label>
-          <input type="text" id="draft-pick" placeholder="e.g. #5 overall, Round 3 Pick 2"/>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Team Needs / Roster Holes</label>
-        <input type="text" id="draft-needs" placeholder="e.g. Need WR and OL depth, already have strong QB"/>
-      </div>
-      <div class="form-group">
-        <label>Players You're Considering (optional)</label>
-        <textarea id="draft-available" placeholder="e.g. Drake Maye, Caleb Williams — or leave blank for open recommendation"></textarea>
-      </div>
-      <button class="submit-btn" onclick="runDraft()">🎯 GET DRAFT ADVICE</button>
-    </div>
-  </div>
-
-  <!-- START/SIT PANEL -->
-  <div class="panel" id="panel-startsit">
-    <div class="form-card">
-      <div class="section-label">Sport</div>
-      <div class="sport-selector">
-        <button class="sport-btn active" onclick="setSport('startsit','NFL',this)">🏈 NFL</button>
-        <button class="sport-btn" onclick="setSport('startsit','NHL',this)">🏒 NHL</button>
-        <button class="sport-btn" onclick="setSport('startsit','NBA',this)">🏀 NBA</button>
-        <button class="sport-btn" onclick="setSport('startsit','MLB',this)">⚾ MLB</button>
-      </div>
-      <div class="section-label">Head to Head</div>
-      <div class="form-row">
-        <div>
-          <label>Player 1</label>
-          <input type="text" id="ss-playerA" placeholder="e.g. Justin Jefferson"/>
-        </div>
-        <div>
-          <label>Player 2</label>
-          <input type="text" id="ss-playerB" placeholder="e.g. Davante Adams"/>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Additional Context (optional)</label>
-        <input type="text" id="ss-context" placeholder="e.g. PPR league, Week 14, tough matchup vs Bills D"/>
-      </div>
-      <button class="submit-btn" onclick="runStartSit()">⚡ GET START/SIT ADVICE</button>
-    </div>
-  </div>
-
-  <!-- RESULTS -->
-  <div id="results-section">
-    <div class="results-header"><span>📡</span><span id="resultsTitle">AI Analysis</span></div>
-    <div class="results-grid" id="resultsGrid"></div>
-  </div>
-
-  <footer>
-    Sports Oracle — Powered by Claude, ChatGPT & Gemini<br>
-    <span style="opacity:0.5">For entertainment. Always do your own research.</span>
-  </footer>
-</div>
-
-<script>
-  const state = {
-    trade: { sport:'NFL', mode:'real' },
-    draft: { sport:'NFL', mode:'real' },
-    startsit: { sport:'NFL' },
-    playersA: [], playersB: [],
-  };
-  let enabledModels = [];
-  const MODEL_COLORS = { claude:'#ff6b35', gpt4:'#19c37d', gemini:'#4285f4' };
-  const MODEL_LABELS = { claude:'CLAUDE', gpt4:'CHATGPT', gemini:'GEMINI' };
-
-  async function init() {
-    try {
-      const res = await fetch('/api/config');
-      const data = await res.json();
-      enabledModels = data.models;
-      const pills = document.getElementById('modelPills');
-      pills.innerHTML = '';
-      enabledModels.forEach(m => {
-        const p = document.createElement('div');
-        p.className = 'model-pill active';
-        p.dataset.model = m.id;
-        p.innerHTML = `<span class="dot"></span>${m.label}`;
-        pills.appendChild(p);
-      });
-      if (!enabledModels.length) showError('No API keys configured. Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY.');
-    } catch(e) { showError('Cannot connect to server.'); }
-  }
-
-  function switchMode(mode) {
-    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(`panel-${mode}`).classList.add('active');
-    document.getElementById('results-section').style.display = 'none';
-  }
-
-  function setSport(panel, sport, btn) {
-    state[panel].sport = sport;
-    btn.closest('.sport-selector').querySelectorAll('.sport-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
-  function setMode(panel, mode, btn) {
-    state[panel].mode = mode;
-    btn.closest('.mode-toggle').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
-  function handleTagInput(e, side) {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const input = document.getElementById(`tagInput-${side}`);
-      const val = input.value.trim().replace(/,$/, '');
-      if (!val) return;
-      (side === 'A' ? state.playersA : state.playersB).push(val);
-      renderTags(side);
-      input.value = '';
-    }
-    if (e.key === 'Backspace' && document.getElementById(`tagInput-${side}`).value === '') {
-      const arr = side === 'A' ? state.playersA : state.playersB;
-      if (arr.length) { arr.pop(); renderTags(side); }
-    }
-  }
-
-  function removeTag(side, idx) {
-    (side === 'A' ? state.playersA : state.playersB).splice(idx, 1);
-    renderTags(side);
-  }
-
-  function renderTags(side) {
-    const arr = side === 'A' ? state.playersA : state.playersB;
-    const container = document.getElementById(`tags-${side}`);
-    const input = document.getElementById(`tagInput-${side}`);
-    container.innerHTML = '';
-    arr.forEach((p, i) => {
-      const tag = document.createElement('div');
-      tag.className = 'player-tag';
-      tag.innerHTML = `${p}<button onclick="removeTag('${side}',${i})">×</button>`;
-      container.appendChild(tag);
-    });
-    container.appendChild(input);
-  }
-
-  function focusTagInput(id) { document.getElementById(id).focus(); }
-  function showError(msg) { const el = document.getElementById('errorBanner'); el.textContent = msg; el.classList.add('active'); }
-  function hideError() { document.getElementById('errorBanner').classList.remove('active'); }
-  function showProgress(label) { document.getElementById('progressLabel').textContent = label; document.getElementById('progressBar').classList.add('active'); document.getElementById('progressFill').style.width = '60%'; }
-  function hideProgress() { document.getElementById('progressBar').classList.remove('active'); document.getElementById('progressFill').style.width = '0%'; }
-
-  function initResults(title) {
-    document.getElementById('resultsTitle').textContent = title;
-    const grid = document.getElementById('resultsGrid');
-    grid.innerHTML = '';
-    enabledModels.forEach(m => {
-      const card = document.createElement('div');
-      card.className = 'result-card';
-      card.dataset.model = m.id;
-      card.innerHTML = `
-        <div class="result-card-header">
-          <div class="result-model-dot" style="background:${MODEL_COLORS[m.id]}"></div>
-          <div class="result-model-name">${MODEL_LABELS[m.id]}</div>
-        </div>
-        <div class="result-body" id="result-${m.id}"><span class="loading">···</span></div>`;
-      grid.appendChild(card);
-    });
-    document.getElementById('results-section').style.display = 'block';
-    setTimeout(() => document.getElementById('results-section').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
-  }
-
-  function formatAnswer(text) {
-    return text
-      .replace(/^(🏆.*)/gm, '<span class="line-winner">$1</span>')
-      .replace(/^(💡.*)/gm, '<span class="line-key">$1</span>')
-      .replace(/^(⚠️.*)/gm, '<span class="line-risk">$1</span>')
-      .replace(/^(💎.*|💥.*|✅.*)/gm, '<span class="line-up">$1</span>')
-      .replace(/^(❌.*)/gm, '<span class="line-risk">$1</span>');
-  }
-
-  async function streamResults(endpoint, body, title) {
-    hideError();
-    if (!enabledModels.length) { showError('No API keys configured.'); return; }
-    showProgress('Consulting AI analysts...');
-    initResults(title);
-    document.querySelectorAll('.submit-btn').forEach(b => b.disabled = true);
-    try {
-      const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Server error'); }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream:true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop();
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          try {
-            const event = JSON.parse(line.slice(6));
-            if (event.type === 'result') {
-              const el = document.getElementById(`result-${event.modelId}`);
-              if (el) { el.classList.toggle('error', event.isError); el.innerHTML = event.isError ? event.answer : formatAnswer(event.answer); }
-            }
-            if (event.type === 'done') hideProgress();
-          } catch(e) {}
-        }
-      }
-    } catch(err) {
-      showError('Error: ' + err.message);
-      hideProgress();
-      enabledModels.forEach(m => { const el = document.getElementById(`result-${m.id}`); if (el) { el.classList.add('error'); el.textContent = 'Request failed.'; } });
-    } finally {
-      document.querySelectorAll('.submit-btn').forEach(b => b.disabled = false);
-    }
-  }
-
-  function runTrade() {
-    if (!state.playersA.length || !state.playersB.length) { showError('Add at least one player to each side of the trade.'); return; }
-    streamResults('/api/trade', { sport:state.trade.sport, mode:state.trade.mode, teamA:document.getElementById('trade-teamA').value, playersA:state.playersA, teamB:document.getElementById('trade-teamB').value, playersB:state.playersB }, `${state.trade.sport} Trade Analysis`);
-  }
-
-  function runDraft() {
-    const pick = document.getElementById('draft-pick').value.trim();
-    if (!pick) { showError('Please enter a draft position or pick number.'); return; }
-    streamResults('/api/draft', { sport:state.draft.sport, mode:state.draft.mode, team:document.getElementById('draft-team').value, pick, needs:document.getElementById('draft-needs').value, available:document.getElementById('draft-available').value }, `${state.draft.sport} Draft Recommendation`);
-  }
-
-  function runStartSit() {
-    const pA = document.getElementById('ss-playerA').value.trim();
-    const pB = document.getElementById('ss-playerB').value.trim();
-    if (!pA || !pB) { showError('Please enter both players.'); return; }
-    streamResults('/api/startsit', { sport:state.startsit.sport, playerA:pA, playerB:pB, context:document.getElementById('ss-context').value }, `Start or Sit — ${pA} vs ${pB}`);
-  }
-
-  document.addEventListener('DOMContentLoaded', init);
-</script>
-</body>
-</html>
+              <input class="tag-input" id="tagInput-A" placeholder="Type name, press Enter..." onkeydown="handleTa
