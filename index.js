@@ -9,6 +9,9 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+const CURRENT_YEAR = 2026;
+const CURRENT_DATE = "March 2026";
+
 const MODELS = [
   { id: "claude",  label: "Claude",  color: "#ff6b35", provider: "anthropic" },
   { id: "gpt4",   label: "ChatGPT", color: "#19c37d", provider: "openai"    },
@@ -54,15 +57,6 @@ async function callModel(modelId, systemPrompt, userPrompt) {
   }
 }
 
-function getEnabledModels() {
-  return MODELS.filter(m => {
-    if (m.provider === "anthropic") return !!process.env.ANTHROPIC_API_KEY;
-    if (m.provider === "openai")    return !!process.env.OPENAI_API_KEY;
-    if (m.provider === "google")    return !!process.env.GEMINI_API_KEY;
-    return false;
-  });
-}
-
 app.get("/api/config", (req, res) => {
   res.json({ models: getEnabledModels() });
 });
@@ -70,9 +64,8 @@ app.get("/api/config", (req, res) => {
 // ── TRADE ANALYZER ──────────────────────────────────────────────────────────
 app.post("/api/trade", async (req, res) => {
   const { sport, mode, teamA, playersA, teamB, playersB } = req.body;
-  if (!sport || !playersA?.length || !playersB?.length) {
+  if (!sport || !playersA?.length || !playersB?.length)
     return res.status(400).json({ error: "Missing required fields." });
-  }
 
   const enabledModels = getEnabledModels();
   if (!enabledModels.length) return res.status(500).json({ error: "No API keys configured." });
@@ -83,18 +76,20 @@ app.post("/api/trade", async (req, res) => {
   const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   send({ type: "models", models: enabledModels });
 
-  const systemPrompt = `You are an elite ${sport} analyst with deep expertise in both real-life ${sport} and fantasy ${sport}. You give sharp, confident, specific trade analysis. Always declare a clear winner. Use player stats, age, position scarcity, team context, and value. Be direct and opinionated.`;
+  const systemPrompt = `You are an elite ${sport} analyst. Today's date is ${CURRENT_DATE}. The current year is ${CURRENT_YEAR}. You have up-to-date knowledge of rosters, contracts, injuries, and player values as of ${CURRENT_DATE}. Only reference players, picks, and roster situations that are current as of ${CURRENT_DATE}. Be bold, confident, and decisive.`;
 
   const userPrompt = `Analyze this ${mode === "fantasy" ? "FANTASY" : "REAL LIFE"} ${sport} trade:
 
 TEAM A gives up: ${playersA.join(", ")}${teamA ? ` (${teamA})` : ""}
 TEAM B gives up: ${playersB.join(", ")}${teamB ? ` (${teamB})` : ""}
 
-Give your analysis in this exact format:
-🏆 WINNER: [Team A or Team B]
-📊 VERDICT: [2-3 sentences on who wins and why]
-💡 KEY FACTOR: [The single most important reason]
-⚠️ RISK: [Biggest risk for the winning side]`;
+Respond in EXACTLY this format with no deviations:
+WINNER: [TEAM A or TEAM B]
+CONFIDENCE: [a number from 1-100]
+VERDICT: [One punchy sentence declaring the winner and why - be bold]
+ANALYSIS: [2-3 sentences of deeper reasoning covering value, age, position, context]
+KEY FACTOR: [The single most important reason in one sentence]
+RISK: [Biggest risk for the winning side in one sentence]`;
 
   const results = await Promise.all(
     enabledModels.map(async (model) => {
@@ -107,10 +102,7 @@ Give your analysis in this exact format:
     })
   );
 
-  for (const r of results) {
-    send({ type: "result", modelId: r.modelId, answer: r.answer, isError: r.isError });
-  }
-
+  for (const r of results) send({ type: "result", modelId: r.modelId, answer: r.answer, isError: r.isError });
   send({ type: "done" });
   res.end();
 });
@@ -129,21 +121,23 @@ app.post("/api/draft", async (req, res) => {
   const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   send({ type: "models", models: enabledModels });
 
-  const systemPrompt = `You are an elite ${sport} draft analyst and scout. You give sharp, specific draft recommendations for both real NFL/NHL/NBA/MLB drafts and fantasy drafts. You consider team needs, best player available, value, upside, and floor. Be confident and decisive.`;
+  const systemPrompt = `You are an elite ${sport} draft analyst. Today's date is ${CURRENT_DATE}. The current year is ${CURRENT_YEAR}. For REAL drafts, only recommend players who are eligible to be drafted in ${CURRENT_YEAR} — do NOT suggest players who were already drafted in previous years. For fantasy drafts, only recommend players currently on active rosters as of ${CURRENT_DATE}. Be bold and decisive.`;
 
-  const userPrompt = `Give a draft recommendation for this ${mode === "fantasy" ? "FANTASY" : "REAL LIFE"} ${sport} situation:
+  const userPrompt = `Give a draft recommendation for this ${mode === "fantasy" ? "FANTASY" : "REAL LIFE"} ${sport} ${mode === "real" ? CURRENT_YEAR : ""} draft:
 
 ${team ? `Team/Manager: ${team}` : ""}
 Draft Position/Pick: ${pick}
 ${needs ? `Team Needs: ${needs}` : ""}
-${available ? `Available Players to Consider: ${available}` : ""}
+${available ? `Players Being Considered: ${available}` : ""}
 
-Give your recommendation in this exact format:
-🎯 PICK: [Player Name or Position]
-📋 REASONING: [2-3 sentences on why this is the right pick]
-💎 UPSIDE: [Best case scenario for this pick]
-📉 FLOOR: [Worst case scenario]
-🔄 ALTERNATIVE: [Who to take if your top pick is gone]`;
+Respond in EXACTLY this format with no deviations:
+PICK: [Player Name and Position]
+CONFIDENCE: [a number from 1-100]
+VERDICT: [One bold punchy sentence on why this is the pick]
+REASONING: [2-3 sentences on fit, value, upside]
+UPSIDE: [Best case scenario in one sentence]
+FLOOR: [Worst case in one sentence]
+ALTERNATIVE: [One player to take if your pick is gone]`;
 
   const results = await Promise.all(
     enabledModels.map(async (model) => {
@@ -156,10 +150,7 @@ Give your recommendation in this exact format:
     })
   );
 
-  for (const r of results) {
-    send({ type: "result", modelId: r.modelId, answer: r.answer, isError: r.isError });
-  }
-
+  for (const r of results) send({ type: "result", modelId: r.modelId, answer: r.answer, isError: r.isError });
   send({ type: "done" });
   res.end();
 });
@@ -178,20 +169,21 @@ app.post("/api/startsit", async (req, res) => {
   const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   send({ type: "models", models: enabledModels });
 
-  const systemPrompt = `You are a fantasy ${sport} expert who gives decisive start/sit advice. You consider matchups, recent form, injuries, weather, Vegas lines, and historical trends. You never hedge — you always give a clear recommendation.`;
+  const systemPrompt = `You are a fantasy ${sport} expert. Today's date is ${CURRENT_DATE}. The current year is ${CURRENT_YEAR}. Use your knowledge of current ${CURRENT_YEAR} season performance, matchups, and injury reports. Never hedge — always give a clear decisive recommendation.`;
 
-  const userPrompt = `Start or Sit decision for fantasy ${sport}:
+  const userPrompt = `Start or Sit decision for fantasy ${sport} (${CURRENT_DATE}):
 
-Player A: ${playerA}
-Player B: ${playerB}
-${context ? `Additional context: ${context}` : ""}
+Player 1: ${playerA}
+Player 2: ${playerB}
+${context ? `Context: ${context}` : ""}
 
-Give your recommendation in this exact format:
-✅ START: [Player Name]
-❌ SIT: [Player Name]  
-📊 REASONING: [2-3 sentences explaining the decision]
-🎲 CONFIDENCE: [High / Medium / Low]
-💥 UPSIDE ALERT: [Any ceiling game potential to know about]`;
+Respond in EXACTLY this format with no deviations:
+START: [Player Name]
+CONFIDENCE: [a number from 1-100]
+VERDICT: [One bold punchy sentence on who to start and why]
+REASONING: [2-3 sentences on matchup, form, and situation]
+CEILING: [Best case for the player you said to start]
+WATCH OUT: [One thing that could make this the wrong call]`;
 
   const results = await Promise.all(
     enabledModels.map(async (model) => {
@@ -204,10 +196,7 @@ Give your recommendation in this exact format:
     })
   );
 
-  for (const r of results) {
-    send({ type: "result", modelId: r.modelId, answer: r.answer, isError: r.isError });
-  }
-
+  for (const r of results) send({ type: "result", modelId: r.modelId, answer: r.answer, isError: r.isError });
   send({ type: "done" });
   res.end();
 });
